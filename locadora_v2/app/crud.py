@@ -76,3 +76,15 @@ def inclui_filmes(titulo,quantidade):
     conn.close()
     logging.info("O Seguinte dado foi inserido na tabela: {}, {}".format(titulo, quantidade))
     return result
+
+def excluir_filmes(titulo):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM filmes WHERE unaccent(titulo) = unaccent(%s) RETURNING *;", (titulo,))
+    result = cur.fetchone()
+    conn.commit()
+    cur.close()
+    conn.close()
+    logging.info("O Seguinte filme foi removido da tabela: {}".format(titulo))
+    return result
