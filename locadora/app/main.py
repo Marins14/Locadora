@@ -1,98 +1,53 @@
-import logging
-from db import get_connection
-from pathlib import Path
+from fastapi import FastAPI
+from fastapi import HTTPException
+from . import crud
 
 """
-    A ideia é montar um banco de dados relacional que faça uma 'locadora virtual'
+    A ideia é montar um banco de dados relacional que faça uma 'locadora virtual' via API!
 """
 
-dir = Path.home() / "Documentos/Python-Testes/locadora/logs/locadora.log"
 
-logging.basicConfig(filename=dir, 
-                    level=logging.INFO, 
-                    format='%(asctime)s :: [%(levelname)s] :: %(message)s' ,
-                    datefmt='%Y-%m-%d %H:%M:%S')
+app = FastAPI()
 
-def criar_tabela():
-    conn = get_connection()
-    cur = conn.cursor()
+@app.get("/filmes")
+def lista_filmes():
+    return crud.listar_filmes()
 
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS filmes (
-            id SERIAL PRIMARY KEY,
-            titulo TEXT NOT NULL,
-            quantidade INT
-        );
-    """)
+@app.get("/filmes/{titulo}")
+def buscar(titulo:str):
+    filme = crud.buscar_filmes(titulo)
 
-    conn.commit()
-    cur.close()
-    conn.close()
-    logging.info("Tabela criada com sucesso!")
-    print("Tabela criada com sucesso!")
+    if not filme:
+        raise HTTPException(status_code=404, detail="Filme não encontrado")
+    return filme
 
-def inserir_dado(titulo, quantidade):
-    conn = get_connection()
-    cur = conn.cursor()
+@app.put("/filmes/remover/{titulo}/{quantidade}")
+def remover(titulo: str, quantidade: int):
+    filme = crud.remover_filmes(titulo, quantidade)
+    if not filme:
+        return {"erro": "Filme não encontrado ou quantidade já é zero"}
+    return filme
 
-    cur.execute("INSERT INTO filmes (titulo, quantidade) VALUES (%s, %s);", (titulo, quantidade))
-    conn.commit()
+@app.put("/filmes/incluir/{titulo}/{quantidade}")
+def incluir(titulo: str, quantidade: int):
 
-    cur.close()
-    conn.close()
-    logging.info("O Seguinte dado foi inserido na tabela: {}, {}".format(titulo, quantidade))
-    print("Dado inserido!")
+    filme_existente = crud.buscar_filmes(titulo)
 
-def listar_dados():
-    conn = get_connection()
-    cur = conn.cursor()
+    if filme_existente:
+        return {"erro": f"O filme '{titulo}' já existe em nosso catálogo!"}
+    filme = crud.inclui_filmes(titulo, quantidade)
 
-    cur.execute("SELECT * FROM filmes;")
-    linhas = cur.fetchall()
+    if not filme:
+        return {"erro": "Não foi possível incluir o filme"}
+    return filme
 
-    print("Conteúdo da tabela:")
-    for linha in linhas:
-        print(linha)
+@app.delete("/filmes/{titulo}")
+def excluir(titulo: str):
 
-    cur.close()
-    conn.close()
+    filme_existente = crud.buscar_filmes(titulo)
 
-def remover_dados(titulo):
-    conn = get_connection()
-    cur = conn.cursor()
-
-
-    cur.execute(
-        "SELECT id, quantidade FROM filmes WHERE titulo ILIKE %s;",
-        (titulo,)
-    )
-    dados = cur.fetchone()
-
-    if not dados:
-        logging.error("Nenhum filme encontrado na base com este título: {}".format(titulo))
-        print("Nenhum filme encontrado com esse título.")
-        cur.close()
-        conn.close()
-        return
-
-    filme_id, quantidade = dados
-
-    nova_quantidade = max(quantidade - 1, 0)
-
-    cur.execute(
-        "UPDATE filmes SET quantidade = %s WHERE id = %s;",
-        (nova_quantidade, filme_id)
-    )
-
-    conn.commit()
-    cur.close()
-    conn.close()
-    logging.info("A quantidade foi atualizada para {} do titulo: {}".format(nova_quantidade, titulo))
-    print(f"Quantidade atualizada para {nova_quantidade}.")
-
-if __name__ == "__main__":
-    criar_tabela()
-    #inserir_dado("Missão Impossível 1", 29)
-    inserir_dado("Rambo 2", 22)
-    listar_dados()
-    remover_dados("Rambo")
+    if not filme_existente:
+        raise HTTPException(status_code=404, detail=f"O filme '{titulo}' não existe em nosso catálogo!")
+    
+    filme = crud.excluir_filmes(titulo)
+    return filme
