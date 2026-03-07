@@ -21,7 +21,7 @@ services:
       POSTGRES_USER: <USER_DB>
       POSTGRES_PASSWORD: <PASSWD_DB>
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root"]
+      test: ["CMD-SHELL", "pg_isready -U appuser"]
       interval: 5s
       timeout: 5s
       retries: 5
