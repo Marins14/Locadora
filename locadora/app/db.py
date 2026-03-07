@@ -7,9 +7,9 @@ load_dotenv()
 
 def get_connection():
     return psycopg2.connect(
-        host=os.getenv("POSTGRES_HOST"),
-        port=os.getenv("POSTGRES_PORT"),
-        database=os.getenv("POSTGRES_DB"),
-        user=os.getenv("POSTGRES_USER"),
-        password=os.getenv("POSTGRES_PASSWORD"),
+        host=os.getenv("POSTGRES_HOST", "localhost"),
+        port=os.getenv("POSTGRES_PORT", "5432"),
+        database=os.getenv("POSTGRES_DB", "locadora"),
+        user=os.getenv("POSTGRES_USER", "applocadora"),
+        password=os.getenv("POSTGRES_PASSWORD", "applocadora"),
     )
