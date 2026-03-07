@@ -10,7 +10,7 @@ def setup_database():
         port=os.getenv("POSTGRES_PORT", 5432),
         database=os.getenv("POSTGRES_DB", "locadora"),
         user=os.getenv("POSTGRES_USER", "postgres"),
-        password=os.getenv("POSTGRES_PASSWORD", "postgres")
+        password=os.getenv("POSTGRES_PASSWORD", "postgres"),
     )
 
     cur = conn.cursor()
@@ -37,7 +37,7 @@ def clean_table(setup_database):
         port=os.getenv("POSTGRES_PORT", 5432),
         database=os.getenv("POSTGRES_DB", "locadora"),
         user=os.getenv("POSTGRES_USER", "postgres"),
-        password=os.getenv("POSTGRES_PASSWORD", "postgres")
+        password=os.getenv("POSTGRES_PASSWORD", "postgres"),
     )
 
     cur = conn.cursor()
@@ -55,14 +55,13 @@ def insert_data():
         port=os.getenv("POSTGRES_PORT", 5432),
         database=os.getenv("POSTGRES_DB", "locadora"),
         user=os.getenv("POSTGRES_USER", "postgres"),
-        password=os.getenv("POSTGRES_PASSWORD", "postgres")
+        password=os.getenv("POSTGRES_PASSWORD", "postgres"),
     )
 
     cur = conn.cursor()
 
     cur.execute(
-        "INSERT INTO filmes (titulo, quantidade) VALUES (%s, %s);",
-        ("teste", 1)
+        "INSERT INTO filmes (titulo, quantidade) VALUES (%s, %s);", ("teste", 1)
     )
 
     conn.commit()

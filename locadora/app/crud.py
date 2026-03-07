@@ -2,13 +2,14 @@ import logging
 from pathlib import Path
 from .db import get_connection
 
-
 dir = Path.home() / "Documentos/Python-Testes/locadora/logs/locadora.log"
 
-logging.basicConfig(filename=dir, 
-                    level=logging.INFO, 
-                    format='%(asctime)s :: [%(levelname)s] :: %(message)s' ,
-                    datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(
+    filename=dir,
+    level=logging.INFO,
+    format="%(asctime)s :: [%(levelname)s] :: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 # def criar_tabela():
 #     conn = get_connection()
@@ -28,6 +29,7 @@ logging.basicConfig(filename=dir,
 #     logging.info("Tabela criada com sucesso!")
 #     print("Tabela criada com sucesso!")
 
+
 def listar_filmes():
     conn = get_connection()
     cur = conn.cursor()
@@ -39,11 +41,15 @@ def listar_filmes():
     conn.close()
     return result
 
+
 def buscar_filmes(titulo):
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM filmes WHERE unaccent(titulo) ILIKE unaccent(%s);", (f"%{titulo}%",))
+    cur.execute(
+        "SELECT * FROM filmes WHERE unaccent(titulo) ILIKE unaccent(%s);",
+        (f"%{titulo}%",),
+    )
     result = cur.fetchall()
 
     cur.close()
@@ -55,7 +61,10 @@ def remover_filmes(titulo, quantos):
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("UPDATE filmes SET quantidade = GREATEST(quantidade - %s, 0) WHERE unaccent(titulo) = unaccent(%s) RETURNING *;", (quantos, titulo))
+    cur.execute(
+        "UPDATE filmes SET quantidade = GREATEST(quantidade - %s, 0) WHERE unaccent(titulo) = unaccent(%s) RETURNING *;",
+        (quantos, titulo),
+    )
     result = cur.fetchone()
 
     conn.commit()
@@ -63,25 +72,38 @@ def remover_filmes(titulo, quantos):
     conn.close()
     return result
 
-def inclui_filmes(titulo,quantidade):
+
+def inclui_filmes(titulo, quantidade):
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("INSERT INTO filmes(titulo,quantidade) VALUES(%s,%s) RETURNING *;", (titulo, quantidade,))
+    cur.execute(
+        "INSERT INTO filmes(titulo,quantidade) VALUES(%s,%s) RETURNING *;",
+        (
+            titulo,
+            quantidade,
+        ),
+    )
 
     result = cur.fetchone()
     conn.commit()
 
     cur.close()
     conn.close()
-    logging.info("O Seguinte dado foi inserido na tabela: {}, {}".format(titulo, quantidade))
+    logging.info(
+        "O Seguinte dado foi inserido na tabela: {}, {}".format(titulo, quantidade)
+    )
     return result
+
 
 def excluir_filmes(titulo):
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("DELETE FROM filmes WHERE unaccent(titulo) = unaccent(%s) RETURNING *;", (titulo,))
+    cur.execute(
+        "DELETE FROM filmes WHERE unaccent(titulo) = unaccent(%s) RETURNING *;",
+        (titulo,),
+    )
     result = cur.fetchone()
     conn.commit()
     cur.close()
