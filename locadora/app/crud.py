@@ -16,6 +16,8 @@ def criar_tabela():
     cur = conn.cursor()
 
     cur.execute("""
+        CREATE EXTENSION IF NOT EXISTS unaccent;
+                
         CREATE TABLE IF NOT EXISTS filmes (
             id SERIAL PRIMARY KEY,
             titulo TEXT NOT NULL,
