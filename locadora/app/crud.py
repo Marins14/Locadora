@@ -11,6 +11,7 @@ from .db import get_connection
 #    datefmt="%Y-%m-%d %H:%M:%S",
 # )
 
+
 def criar_tabela():
     conn = get_connection()
     cur = conn.cursor()
@@ -27,6 +28,8 @@ def criar_tabela():
     conn.commit()
     cur.close()
     conn.close()
+
+
 #     logging.info("Tabela criada com sucesso!")
 #     print("Tabela criada com sucesso!")
 
