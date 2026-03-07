@@ -12,8 +12,8 @@ while True:
             password=os.getenv("POSTGRES_PASSWORD"),
         )
         conn.close()
-        print("Database ready 🚀")
+        print("Banco de dados funcional!")
         break
     except psycopg2.OperationalError:
-        print("Waiting for database...")
+        print("Aguardando pelo banco de dados...")
         time.sleep(2)
