@@ -12,9 +12,10 @@ app = FastAPI()
 
 
 async def lifespan(app: FastAPI):
-    crud.criar_tabela() 
+    crud.criar_tabela()
     yield
     print("Servidor finalizado.")
+
 
 @app.get("/")
 def redirect():
