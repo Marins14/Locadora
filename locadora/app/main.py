@@ -11,10 +11,10 @@ from . import crud
 app = FastAPI()
 
 
-@app.lifespan(app)
-def init_table():
-    return crud.criar_tabela()
-
+async def lifespan(app: FastAPI):
+    crud.criar_tabela() 
+    yield
+    print("Servidor finalizado.")
 
 @app.get("/")
 def redirect():
