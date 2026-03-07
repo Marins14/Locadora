@@ -61,4 +61,25 @@ jobs:
     - name: Build Docker Image
       working-directory: locadora
       run: |
-        docker build -t locadora_virtual:1.0.0 .
+        docker build -t locadora_api:1.0.0 .
+
+    - name: Build Docker
+      working-directory: locadora
+      run: docker build -t marins/locadora-api:1.0 .
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Login no Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build e Push da Imagem
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/locadora-api:1.0
