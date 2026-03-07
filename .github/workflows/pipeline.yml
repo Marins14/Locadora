@@ -73,4 +73,4 @@ jobs:
         context: ./locadora/
         file: ./locadora/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/locadora-api:1.0
+        tags: locadora-api:1.0
