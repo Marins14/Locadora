@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi import HTTPException
+from fastapi.responses import RedirectResponse
 from . import crud
 
 """
@@ -10,9 +11,15 @@ from . import crud
 app = FastAPI()
 
 
-@app.on_event("startup")
+@app.lifespan(app)
 def init_table():
     return crud.criar_tabela()
+
+
+@app.get("/")
+def redirect():
+    """Redireciona a raiz para a documentação automática"""
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/filmes")
