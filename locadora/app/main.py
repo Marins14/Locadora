@@ -1,6 +1,6 @@
-from fastapi import FastAPI
-from fastapi import HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
+from contextlib import asynccontextmanager
 from . import crud
 
 """
@@ -8,14 +8,18 @@ from . import crud
 """
 
 
-app = FastAPI()
-
-
+@asynccontextmanager
 async def lifespan(app: FastAPI):
-    crud.criar_tabela()
+    try:
+        crud.criar_tabela()
+        print("Banco de dados inicializado com sucesso.")
+    except Exception as e:
+        print(f"Erro ao iniciar o banco: {e}")
+    
     yield
     print("Servidor finalizado.")
 
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def redirect():
@@ -45,7 +49,7 @@ def remover(titulo: str, quantidade: int):
     return filme
 
 
-@app.put("/filmes/incluir/{titulo}/{quantidade}")
+@app.post("/filmes/incluir/{titulo}/{quantidade}")
 def incluir(titulo: str, quantidade: int):
 
     filme_existente = crud.buscar_filmes(titulo)
