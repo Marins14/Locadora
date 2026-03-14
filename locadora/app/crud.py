@@ -13,12 +13,22 @@ from .db import get_connection
 
 
 def criar_tabela():
+    # 1. Primeira conexão apenas para a extensão
+    try:
+        conn = get_connection()
+        conn.set_isolation_level(0)
+        cur = conn.cursor()
+        cur.execute("CREATE EXTENSION IF NOT EXISTS unaccent;")
+        cur.close()
+        conn.close()
+        #print("DEBUG: Extensão unaccent verificada.")
+    except Exception as e:
+        print(f"DEBUG: Aviso na extensão (pode já existir): {e}")
+
+    # 2. Segunda conexão/transação apenas para a tabela
     conn = get_connection()
     cur = conn.cursor()
     try:
-        cur.execute("CREATE EXTENSION IF NOT EXISTS unaccent;")
-        conn.commit() 
-        
         cur.execute("""
             CREATE TABLE IF NOT EXISTS filmes (
                 id SERIAL PRIMARY KEY,
@@ -27,9 +37,10 @@ def criar_tabela():
             );
         """)
         conn.commit()
-        print("DEBUG: Tabela 'filmes' criada/verificada com sucesso.")
+        #print("DEBUG: Tabela 'filmes' criada/verificada com sucesso.")
     except Exception as e:
-        print(f"DEBUG ERRO: Falha ao executar comandos no banco: {e}")
+        #print(f"DEBUG ERRO: Falha ao criar tabela: {e}")
+        conn.rollback()
     finally:
         cur.close()
         conn.close()
