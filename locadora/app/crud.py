@@ -15,19 +15,24 @@ from .db import get_connection
 def criar_tabela():
     conn = get_connection()
     cur = conn.cursor()
-
-    cur.execute("""
-        CREATE EXTENSION IF NOT EXISTS unaccent;
-                
-        CREATE TABLE IF NOT EXISTS filmes (
-            id SERIAL PRIMARY KEY,
-            titulo TEXT NOT NULL,
-            quantidade INT
-        );
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        cur.execute("CREATE EXTENSION IF NOT EXISTS unaccent;")
+        conn.commit() 
+        
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS filmes (
+                id SERIAL PRIMARY KEY,
+                titulo TEXT NOT NULL,
+                quantidade INT
+            );
+        """)
+        conn.commit()
+        print("DEBUG: Tabela 'filmes' criada/verificada com sucesso.")
+    except Exception as e:
+        print(f"DEBUG ERRO: Falha ao executar comandos no banco: {e}")
+    finally:
+        cur.close()
+        conn.close()
 
 
 #     logging.info("Tabela criada com sucesso!")
